@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mextran</title>
+
+  <!-- Favicon -->
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="style/style.css" /> 
+  <link rel="stylesheet" href="style/navbar.css" />
+  <link rel="stylesheet" href="style/carrusel.css" />
+  <link rel="stylesheet" href="style/ventajas.css" />
+  <link rel="stylesheet" href="style/footer.css" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+</head>
+<body>
+  <!-- Preloader -->
+  <div id="preloader"><div class="spinner"></div></div>
+
+  <!-- Navbar -->
+  <div id="navbar-container"></div>
+
+  <!-- Carrusel -->
+  <div id="carousel-wrapper"></div>
+
+  <!-- Ventajas -->
+  <div id="ventajas-wrapper"></div>
+
+  <!-- Modal de contacto -->
+  <div id="contact-modal" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-modal" id="close-modal">&times;</span>
+      <h2>Formulario de Contacto</h2>
+      <form id="form-contacto">
+        <input type="text" name="nombre" placeholder="Nombre" required />
+        <input type="email" name="email" placeholder="Correo electrónico" required />
+        <textarea name="mensaje" placeholder="Mensaje" rows="4" required></textarea>
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pop-up de éxito -->
+  <div id="popup-exito" class="popup">
+    <div class="popup-content">
+      <span class="close-popup" id="cerrar-popup">&times;</span>
+      <div class="popup-icon">✔️</div>
+      <p>¡Gracias! Tu mensaje fue enviado correctamente.</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer-container"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Navbar
+      fetch('componentes/navbar.html')
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById('navbar-container').innerHTML = html;
+          const toggle = document.getElementById('toggle');
+          const menu = document.getElementById('menu');
+          toggle?.addEventListener('click', () => {
+            menu?.classList.toggle('show');
+            toggle?.classList.toggle('activa');
+          });
+
+          const logo = document.getElementById('logo-link');
+          logo?.addEventListener('click', e => {
+            if (location.pathname.includes('index') || location.pathname === '/') {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              logo.classList.add('clicked');
+              setTimeout(() => logo.classList.remove('clicked'), 500);
+            }
+          });
+
+          // Activar modal desde navbar
+          document.getElementById('open-modal')?.addEventListener('click', e => {
+            e.preventDefault();
+            document.getElementById('contact-modal')?.classList.add('show');
+          });
+        });
+
+      // Carrusel
+      fetch('php/carrusel.php')
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById('carousel-wrapper').innerHTML = html;
+
+          new Swiper('.mySwiper', {
+            loop: true,
+            effect: 'fade',
+            fadeEffect: { crossFade: true },
+            autoplay: {
+              delay: 4000,
+              disableOnInteraction: false
+            },
+            pagination: {
+              el: '.swiper-pagination',
+              clickable: true
+            },
+            navigation: {
+              nextEl: '.swiper-button-next',
+              prevEl: '.swiper-button-prev'
+            },
+            grabCursor: true
+          });
+
+          document.getElementById('preloader').style.display = 'none';
+        });
+
+      // Ventajas
+      fetch('componentes/ventajas.html')
+        .then(res => res.text())
+        .then(html => document.getElementById('ventajas-wrapper').innerHTML = html);
+
+      // Footer
+      fetch('componentes/footer.html')
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById('footer-container').innerHTML = html;
+
+          // Activar modal desde footer si existe
+          document.getElementById('open-modal')?.addEventListener('click', e => {
+            e.preventDefault();
+            document.getElementById('contact-modal')?.classList.add('show');
+          });
+        });
+
+      // Cerrar modal
+      document.getElementById('close-modal')?.addEventListener('click', () => {
+        document.getElementById('contact-modal')?.classList.remove('show');
+      });
+
+      window.addEventListener('click', e => {
+        if (e.target === document.getElementById('contact-modal')) {
+          document.getElementById('contact-modal')?.classList.remove('show');
+        }
+      });
+
+      // Pop-up de éxito
+      const popup = document.getElementById('popup-exito');
+      document.getElementById('cerrar-popup')?.addEventListener('click', () => {
+        popup.classList.remove('show');
+        document.querySelector('#productos')?.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      function mostrarPopup() {
+        popup.classList.add('show');
+        setTimeout(() => {
+          popup.classList.remove('show');
+          document.querySelector('#productos')?.scrollIntoView({ behavior: 'smooth' });
+        }, 5000);
+      }
+
+      // Envío de formulario
+      document.getElementById('form-contacto')?.addEventListener('submit', e => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        fetch('php/procesar-contacto.php', {
+          method: 'POST',
+          body: formData
+        })
+          .then(res => res.text())
+          .then(data => {
+            if (data.includes("correctamente")) {
+              e.target.reset();
+              mostrarPopup();
+            } else {
+              alert(data);
+            }
+          })
+          .catch(() => alert('Error al enviar el formulario.'));
+      });
+    });
+  </script>
+</body>
+</html>

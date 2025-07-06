@@ -1,0 +1,57 @@
+/* === Sección de Ventajas === */
+.ventajas {
+    background: #fafafa;
+    padding: 40px 20px;
+  }
+  
+  /* Contenedor flexible */
+  .ventajas-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: auto;
+    gap: 30px;
+    text-align: center;
+  }
+  
+  /* Cada bloque individual */
+  .ventaja {
+    flex: 1 1 220px;
+    min-width: 180px;
+    padding: 10px;
+    transition: transform 0.3s ease;
+  }
+  .ventaja:hover {
+    transform: translateY(-4px);
+  }
+  
+  /* Íconos */
+  .ventaja img {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 12px;
+  }
+  
+  /* Texto */
+  .ventaja p {
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+    margin: 0;
+  }
+  
+  /* === Responsive === */
+  @media (max-width: 768px) {
+    .ventajas-container {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .ventaja {
+      width: 100%;
+      max-width: 350px;
+      margin-bottom: 20px;
+    }
+  }
